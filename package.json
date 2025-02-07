@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "prepare": "husky",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "npm run build && git add docs && git commit -m 'Deploy' && git push"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",
