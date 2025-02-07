@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react"
 import { format, parse } from "date-fns"
+import html2canvas from "html2canvas"
+import { jsPDF } from "jspdf"
 import {
+  Download,
   PanelLeftClose,
   PanelLeftOpen,
   PanelRightClose,
@@ -133,6 +136,34 @@ const LectureNotes: React.FC = () => {
     setZoomLevel((prevZoom) => Math.max(prevZoom - 10, 50))
   }
 
+  const handleDownloadPDF = async () => {
+    const pdf = new jsPDF("p", "mm", "a4")
+    const content = contentRef.current
+
+    if (!content) return
+
+    const images = content.querySelectorAll("img")
+    if (images.length === 0) {
+      alert("No images to download!")
+      return
+    }
+
+    for (let i = 0; i < images.length; i++) {
+      const img = images[i] as HTMLImageElement
+
+      const canvas = await html2canvas(img, { scale: 2 })
+      const imgData = canvas.toDataURL("image/png")
+
+      // Add image to PDF
+      const imgWidth = 190 // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
+      if (i > 0) pdf.addPage()
+      pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight)
+    }
+
+    pdf.save(`${topic || "LectureNotes"}.pdf`)
+  }
+
   /* day of week */
   const fullDateStr = getFullDate(semester!, date!)
   const parsedDate = parse(fullDateStr, "yyyy-M-d", new Date())
@@ -183,6 +214,13 @@ const LectureNotes: React.FC = () => {
             <h2 className="ml-2 text-lg text-gray-300">
               ({dayOfWeek}, {formatDate(date!)})
             </h2>
+            <button
+              onClick={handleDownloadPDF}
+              className="ml-2 rounded-md bg-neutral-600 p-1 text-white hover:bg-neutral-500"
+              disabled={zoomLevel >= 200}
+            >
+              <Download size={20} />
+            </button>
             <div className="flex flex-1 items-center justify-end space-x-2">
               <button
                 onClick={handleZoomOut}
