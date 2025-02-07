@@ -6,7 +6,7 @@ import SemesterPage from "./SemesterPage"
 
 const App: React.FC = () => {
   return (
-    <Router basename={import.meta.env.BASE_URL || "/cs251"}>
+    <Router basename={import.meta.env.BASE_URL || "/docs"}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/:semester" element={<SemesterPage />} />
